@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /*
   Caroto
   Programa principal de funcionamiento del carrito para Aldea
