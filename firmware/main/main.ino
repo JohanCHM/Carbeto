@@ -1,11 +1,12 @@
 /*  Nombre de archivo: main.ino
-*   Proyecto: Caroto
+*   Proyecto: Carbeto
 *   Programa principal para el carrito de aldea
-
- */
+*/
 
 //	************************* LIBRARIES ***********************************
 #include <Arduino.h>
+
+#include "carbeto.h"
 
 //	************************* VARIABLES ***********************************
 enum Estados {
@@ -25,6 +26,7 @@ Estados estadoCarbeto; //!< Estado actual en el que se encuentra el robot
 
 void setup() {
   // put your setup code here, to run once:
+
 
 }
 
