@@ -2,8 +2,8 @@
 *   Proyecto: Carbeto
 *   Archivo principal para el control de cabeceras
 */
-#ifndef CARBETO_H
-#define CARBETO_H
+//#ifndef CARBETO_H
+//#define CARBETO_H
 
 //	********************* ARDUINO LIBRARIES ***********************************
 

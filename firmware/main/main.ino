@@ -6,7 +6,7 @@
 //	************************* LIBRARIES ***********************************
 #include <Arduino.h>
 
-#include "carbeto.h"
+#include "src/carbeto.h"
 
 //	************************* VARIABLES ***********************************
 enum Estados {
@@ -25,7 +25,24 @@ Estados estadoCarbeto; //!< Estado actual en el que se encuentra el robot
 //	************************* SETUP ***************************************
 
 void setup() {
-  // put your setup code here, to run once:
+  //Entradas
+  pinMode(PISO, INPUT);
+  pinMode(CHOQUE, OUTPUT);
+
+  //Salidas
+  pinMode(RGB, OUTPUT);
+  pinMode(BUZZ, OUTPUT);
+
+  pinMode(PWM_A, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+
+  pinMode(PWM_B, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+
+  //COMUNICACIÓN SERIAL
+  Serial.begin(9600);
 
 
 }
