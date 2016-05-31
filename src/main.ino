@@ -6,8 +6,9 @@
 //	************************* LIBRARIES ***********************************
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include <TimerOne.h>
 
-#include "src/carbeto.h"
+#include "carbeto.h"
 
 //	************************* VARIABLES ***********************************
 enum Estados {
@@ -24,6 +25,8 @@ enum Estados {
 Estados estadoCarbeto; //!< Estado actual en el que se encuentra el robot
 
 Adafruit_NeoPixel luces = Adafruit_NeoPixel(LED_COUNT, RGB, NEO_GRB + NEO_KHZ400); //!< objeto para controlar los LEDs
+
+int banderaTiempo1 = LOW;  //!< bandera para denotar el Timer1
 
 // ********************FUNCTIONS**********************************************
 // LEDS*************
@@ -99,15 +102,18 @@ void ledError()
 void ledGroovy()
 {
   static int i=0; //exp
-  //for (int i=0; i<LED_COUNT*10; i++)
-  //{
-    rainbow(i);
-    delay(100);  // Delay between rainbow slides
+  rainbow(i);
+  delay(100);  // Delay between rainbow slides
+  //if (banderaTiempo1) {
+    i++;
+    if (i>=LED_COUNT*10){
+      i=0;
+
+    }
+    //reiniciarTimer1();
   //}
-  i++;
-  if (i>=LED_COUNT*10){
-    i=0;
-  }
+
+
 } //End of ledGroovy
 
 /** Apagado de LEDs */
@@ -179,6 +185,24 @@ uint32_t rainbowOrder(byte position)
   }
 }
 
+// ******* TIMERS ************
+
+/** Acción para la interrupción al final del timer1 */
+void finTimer1()
+{
+  banderaTiempo1 = HIGH;
+  Timer1.detachInterrupt();
+  Timer1.stop();
+  Serial.print("no ");
+} //End finTimer1
+
+void reiniciarTimer1()
+{
+  banderaTiempo1 = LOW;
+  Timer1.attachInterrupt (finTimer1);
+  Timer1.start();
+} //End reiniciarTimer1
+
 
 //	************************* SETUP ***************************************
 
@@ -201,6 +225,7 @@ void setup() {
 
   //COMUNICACIÓN SERIAL
   Serial.begin(9600);
+  Serial.print("hola ");
 
   //Luces
   luces.begin();  // Inicia los LEDs
@@ -208,6 +233,10 @@ void setup() {
 
   //Inicializar estados
   estadoCarbeto = ESPERA;
+
+  //Timers
+  Timer1.initialize (100000);
+  Timer1.attachInterrupt (finTimer1);
 }
 
 //	************************* PROGRAM ***************************************
