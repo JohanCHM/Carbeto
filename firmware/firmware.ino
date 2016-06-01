@@ -115,8 +115,16 @@ void loop() {
 			Serial.print("\t");
 			Serial.print(pwmDer);
 			Serial.println();
-			
 
+			Serial.readBytesUntil('F', instruc, 16);
+
+			Serial.print("Size of Array:");
+			Serial.print("\t");
+			int i = sizeof(instruc);
+			Serial.print(i);
+			Serial.println();
+			
+			
 			estadoCarbeto = ADELANTE;
 			cambioDeEstado();//<----Debug
 
@@ -142,18 +150,39 @@ void loop() {
 			ledAdelante();
 			banderaPrimer = HIGH;
 		}
+
+
 		break;
 
 	case IZQUIERDA:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledIzq();
+			banderaPrimer = HIGH;
+		}
 		break;
 
 	case DERECHA:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledDer();
+			banderaPrimer = HIGH;
+		}
 		break;
 
 	case ERROR:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledError();
+			banderaPrimer = HIGH;
+		}
 		break;
 
 	case LEVANTADO:
+		if (banderaPrimer == LOW){
+			ledOff();
+			banderaPrimer = HIGH;
+		}
 		break;
 
 	default:
