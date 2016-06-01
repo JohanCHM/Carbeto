@@ -1,4 +1,9 @@
 /*
+*  Colors in the Tags for "Aldea Digital!
+*/
+#define BARRIDO		100		//!< milisegundos para el barrido en groovy
+
+/*
  *  Colors in the Tags for "Aldea Digital!
  */
 
