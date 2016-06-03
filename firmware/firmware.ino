@@ -4,56 +4,56 @@
 */
 
 //	************************* LIBRARIES ***********************************
-
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <TimerOne.h>
 
 #include "src/carbeto.h"
+#include "src/Motores.h"
 
 //	************************* VARIABLES ***********************************
-enum Estados {
-	ESPERA,
-	SALVAR,
-	DECIDIR,
-	ADELANTE,
-	IZQUIERDA,
-	DERECHA,
-	ERROR,
-	LEVANTADO
+enum _State {
+	STA_ESPERA,
+	STA_SALVAR,
+	STA_DECIDIR,
+	STA_ADELANTE,
+	STA_ADELANTEREP,
+	STA_IZQUIERDA,
+	STA_IZQUIERDAREP,
+	STA_DERECHA,
+	STA_DERECHAREP,
+	STA_ERROR,
+	STA_LEVANTADO
 };
 
-Estados estadoCarbeto; //!< Estado actual en el que se encuentra el robot
+_State State;//!< Estado actual en el que se encuentra el robot
 
-Adafruit_NeoPixel luces = Adafruit_NeoPixel(LED_COUNT, RGB, NEO_GRB + NEO_KHZ400); //!< objeto para controlar los LEDs
+Adafruit_NeoPixel luces = Adafruit_NeoPixel(LED_COUNT, PIN_RGB, NEO_GRB + NEO_KHZ400); //!< objeto para controlar los LEDs
 
 unsigned long tiempo;	//!< variable de almacenamiento de milisegundos
 
-int pwmIzq = 255;	//!< PWM de calibración para el motor izq
-int pwmDer = 255;	//!< PWM de calibración para el motor der
-
-char instruc[16];	//!< Cadena para almacenar los caracteres
+char instruc[28];	//!< Cadena para almacenar los caracteres
 
 int banderaTiempo1 = LOW;  //!< bandera para denotar el Timer1
+
+
 int banderaPrimer = LOW;	//!< bandera para la primer corrida
+
+
+
 
 void setup()
 {
 	//Entradas
-	pinMode(PISO, INPUT);
-	pinMode(CHOQUE, OUTPUT);
+	pinMode(SEN_PISO, INPUT);
+	pinMode(SEN_CHOQUE, OUTPUT);
 
 	//Salidas
-	pinMode(RGB, OUTPUT);
-	pinMode(BUZZ, OUTPUT);
+	pinMode(PIN_RGB, OUTPUT);
+	pinMode(PIN_BUZZ, OUTPUT);
 
-	pinMode(PWM_A, OUTPUT);
-	pinMode(AIN1, OUTPUT);
-	pinMode(AIN2, OUTPUT);
-
-	pinMode(PWM_B, OUTPUT);
-	pinMode(BIN1, OUTPUT);
-	pinMode(BIN2, OUTPUT);
+	//Motores
+	Motores ruedas = Motores();
 
 	//COMUNICACIÓN SERIAL
 	Serial.begin(9600);
@@ -63,7 +63,7 @@ void setup()
 	ledOff(); //Apaga los LEDs
 
 	//Inicializar estados
-	estadoCarbeto = ESPERA;
+	State = STA_ESPERA;
 
 	//Timers
 	Timer1.initialize(100000);
@@ -82,29 +82,31 @@ void setup()
 //	************************* PROGRAM ***************************************
 
 void loop() {
-	switch (estadoCarbeto) {
-	case ESPERA:
+	switch (State) {
+	case STA_ESPERA:
 		ledGroovy();
+		
 
 		if (Serial.available() > 0) {	//Si hay información en el serial
-			estadoCarbeto = SALVAR;
+			State = STA_SALVAR;
 			cambioDeEstado();
 		}
 
 		break;
 
-	case SALVAR:
+	case STA_SALVAR:
 		//Si es la primera vez que entra al estado después de un cambio
 		if (banderaPrimer == LOW){
 			ledOff();	// Apaga los LEDs
 			banderaPrimer = HIGH;
+
 		}
 
 		if (Serial.find("S")) {
 			// lee y convierte el primer valor hasta la coma:
-			int pwmIzq = Serial.parseInt();
+			ruedas.configurarA(Serial.parseInt());
 			// lee y convierte el segundo valor hasta la coma:
-			int pwmDer = Serial.parseInt();
+			pwmDer = Serial.parseInt();
 
 			//Debug---->
 			Serial.print("Motor Izq:");
@@ -125,14 +127,14 @@ void loop() {
 			Serial.println();
 			
 			
-			estadoCarbeto = ADELANTE;
+			State = STA_ADELANTE;
 			cambioDeEstado();//<----Debug
 
 		}
-		else
+		else //Si la cadena no empieza con S
 		{
-			Serial.write("cadena erronea\n");
-			estadoCarbeto = ESPERA;
+			Serial.write("cadena erronea\n");	//Manda un mensaje de error por Serial
+			State = STA_ESPERA;
 			cambioDeEstado();
 		}
 
@@ -140,49 +142,165 @@ void loop() {
 
 		break;
 
-	case DECIDIR:
+	case STA_DECIDIR:
 
 		break;
 
-	case ADELANTE:
+	case STA_ADELANTE:
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledAdelante();
 			banderaPrimer = HIGH;
 		}
+		//Gira motor Derecho adelante 100% PWM
+		//Gira motor Izquierdo adelante 100% PMM
 
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_ADELANTEREP;
+		cambioDeEstado();
+		// <---- Debug
+
+		break;
+	case STA_ADELANTEREP:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledRepAdelante();
+			banderaPrimer = HIGH;
+		}
+		//Gira motor Derecho adelante 100% PWM
+		//Gira motor Izquierdo adelante 100% PMM
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_IZQUIERDA;
+		cambioDeEstado();
+		// <---- Debug
 
 		break;
 
-	case IZQUIERDA:
+	case STA_IZQUIERDA:
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledIzq();
 			banderaPrimer = HIGH;
 		}
+		//Gira motor Derecho adelante 100% PWM
+		//Gira motor Izquierdo atras 80% PMM
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_IZQUIERDAREP;
+		cambioDeEstado();
+		// <---- Debug
+
 		break;
 
-	case DERECHA:
+	case STA_IZQUIERDAREP:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledRepIzq();
+			banderaPrimer = HIGH;
+		}
+		//Gira motor Derecho adelante 100% PWM
+		//Gira motor Izquierdo atras 80% PMM
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_DERECHA;
+		cambioDeEstado();
+		// <---- Debug
+
+		break;
+
+	case STA_DERECHA:
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledDer();
 			banderaPrimer = HIGH;
 		}
+		//Gira motor Izquierdo adelante 100% PWM
+		//Gira motor Derecho atras 80% PMM
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_DERECHAREP;
+		cambioDeEstado();
+		// <---- Debug
+
 		break;
 
-	case ERROR:
+	case STA_DERECHAREP:
+		if (banderaPrimer == LOW){
+			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
+			ledRepDer();
+			banderaPrimer = HIGH;
+		}
+		//Gira motor Izquierdo adelante 100% PWM
+		//Gira motor Derecho atras 80% PMM
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_ERROR;
+		cambioDeEstado();
+		// <---- Debug
+
+		break;
+
+	case STA_ERROR:
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledError();
 			banderaPrimer = HIGH;
 		}
+		// Apagar motores
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_LEVANTADO;
+		cambioDeEstado();
+		// <---- Debug
+
 		break;
 
-	case LEVANTADO:
+	case STA_LEVANTADO:
 		if (banderaPrimer == LOW){
+			ledBlanco();
 			ledOff();
 			banderaPrimer = HIGH;
 		}
+		// Apagar motores
+
+		//Debug ----->
+		delay(500);
+		delay(500);
+		delay(500);
+		delay(500);
+		State = STA_ESPERA;
+		cambioDeEstado();
+		// <---- Debug
+
 		break;
 
 	default:
@@ -226,7 +344,7 @@ void ledRepAdelante()
 	for (int i = 0; i < LED_COUNT; i++) {
 		luces.setPixelColor(i, FRENTE);
 	}
-	luces.setPixelColor(3, REPITE);  //Pone el LED central en morado
+	luces.setPixelColor(2, REPITE);  //Pone el LED central en morado
 	luces.show();
 	delay(5);
 } // End of ledRepAdelante
@@ -247,7 +365,7 @@ void ledRepIzq()
 	for (int i = 0; i < LED_COUNT; i++) {
 		luces.setPixelColor(i, IZQ);
 	}
-	luces.setPixelColor(3, REPITE);  //Pone el LED central en morado
+	luces.setPixelColor(2, REPITE);  //Pone el LED central en morado
 	luces.show();
 	delay(5);
 } // End of ledRepIzq
@@ -268,7 +386,7 @@ void ledRepDer()
 	for (int i = 0; i < LED_COUNT; i++) {
 		luces.setPixelColor(i, DER);
 	}
-	luces.setPixelColor(3, REPITE);  //Pone el LED central en morado
+	luces.setPixelColor(2, REPITE);  //Pone el LED central en morado
 	luces.show();
 	delay(5);
 } //End of ledRepDer
@@ -384,5 +502,6 @@ void finTimer1(void)
 void cambioDeEstado()
 {
 	banderaPrimer = LOW;
+	
 	tiempo = millis();
 }

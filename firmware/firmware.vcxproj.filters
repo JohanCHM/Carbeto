@@ -30,5 +30,13 @@
     <ClInclude Include="src\colors.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Motores.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Motores.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

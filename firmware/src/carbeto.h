@@ -10,7 +10,8 @@
 //	********************* OTHER LIBRARIES ***********************************
 
 //	********************* PROJECT LIBRARIES ***********************************
-#include "pins.h" //Define los pines de la tarjeta
-#include "colors.h"  // Define los colores a usar 
+#include "pins.h"		//Define los pines de la tarjeta
+#include "colors.h"		// Define los colores a usar 
+#include "Motores.h"	// Define las funciones para accionamiento de los motores 
 
 #endif
