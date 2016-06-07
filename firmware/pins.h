@@ -10,10 +10,10 @@
 #define PIN_RGB     3
 #define PIN_BUZZ    5 //
 
-#define PWM_A   6 //PWM de control para el motor A
-#define AIN1    8
-#define AIN2    7
+#define PIN_PWM_A   6 //!< PWM de control para el motor A
+#define PIN_AIN1    8
+#define PIN_AIN2    7
 
-#define PWM_B   11  //PWM de control para el motor b
-#define BIN1    9
-#define BIN2    10
+#define PIN_PWM_B   11  //!< PWM de control para el motor B
+#define PIN_BIN1    9
+#define PIN_BIN2    10

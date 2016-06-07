@@ -11,8 +11,7 @@
 	#include "WProgram.h"
 #endif
 
-#include "pins.h"	//Cabecera para incluir la distribución d elos pines
-
+// Valores de calibración para la vuelta
 #define MUCHO	100
 #define POCO	80
 
@@ -22,17 +21,14 @@ public:
 	// ****** CONSTRUCTOR
 	
 	/** Constructor with the pins for the motors
-	* \param pwmA Valor de calibracion para el motor A
+	* \param pwmA pin pwm del motor A
 	* \param motA1 pin 1 del motor A
 	* \param motA2 pin 2 del motor A
-	* \param pwmB Valor de calibracion para el motor B
+	* \param pwmB pin pwm del motor B
 	* \param motB1 pin 1 del motor A
 	* \param motB2 pin 2 del motor A
 	*/
 	Motores(int pwmA, int motA1, int motA2, int pwmB, int motB1, int motB2);
-
-	/** Default destructor */
-	~Motores();
 
 	/** Inicializa los motores */
 	void begin();
@@ -65,29 +61,19 @@ public:
 	void configurar(int pwmA, int pwmB);
 
 	// ****** FUNCTIONS
-	/** Eleva la base a la potencia
-	* \return el valor de la base ya elevado a la potencia
-	*/
+	/** Mueve los dos motores hacia adelante */
 	void avanza();
 
-	/** Eleva la base a la potencia
-	* \return el valor de la base ya elevado a la potencia
-	*/
+	/** Mueve los dos motores hacia adelante */
 	void retrocede();
 
-	/** Eleva la base a la potencia
-	* \return el valor de la base ya elevado a la potencia
-	*/
+	/** Detiene los motores */
 	void detiene();
 
-	/** Eleva la base a la potencia
-	* \return el valor de la base ya elevado a la potencia
-	*/
+	/** Gira a la Izquierda */
 	void girarIzq();
 
-	/** Eleva la base a la potencia
-	* \return el valor de la base ya elevado a la potencia
-	*/
+	/** gira a la Derecha*/
 	void girarDer();
 
 private:
@@ -100,6 +86,10 @@ private:
 	int pinBIN2;	//!< pin 2 del motor B
 	int pwm_motorA;	//!< PWM de calibración para el motor A
 	int pwm_motorB;	//!< PWM de calibración para el motor B
+	int valAPoco;	//!< PWM de giro poco para vuelta excentrica del motor A 
+	int valAMucho;	//!< PWM de giro mucho para vuelta excentrica del motor A
+	int valBPoco;	//!< PWM de giro poco para vuelta excentrica del motor B
+	int valBMucho;	//!< PWM de giro mucho para vuelta excentrica del motor B
 
 }; //End of class motores
 

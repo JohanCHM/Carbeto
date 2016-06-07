@@ -8,8 +8,8 @@
 #include <Adafruit_NeoPixel.h>
 #include <TimerOne.h>
 
-#include "src/carbeto.h"
-#include "src/Motores.h"
+#include "carbeto.h"
+#include "Motores.h"
 
 //	************************* VARIABLES ***********************************
 enum _State {
@@ -36,6 +36,7 @@ char instruc[28];	//!< Cadena para almacenar los caracteres
 
 int banderaTiempo1 = LOW;  //!< bandera para denotar el Timer1
 
+Motores llantas = Motores(6, 8, 7, 11, 9, 10);	//!< Objeto para accionar motores
 
 int banderaPrimer = LOW;	//!< bandera para la primer corrida
 
@@ -53,9 +54,9 @@ void setup()
 	pinMode(PIN_BUZZ, OUTPUT);
 
 	//Motores
-	Motores ruedas = Motores();
+	//llantas.begin();
 
-	//COMUNICACIÓN SERIAL
+	//COMUNICACIï¿½N SERIAL
 	Serial.begin(9600);
 	
 	//Luces
@@ -87,7 +88,7 @@ void loop() {
 		ledGroovy();
 		
 
-		if (Serial.available() > 0) {	//Si hay información en el serial
+		if (Serial.available() > 0) {	//Si hay informaciï¿½n en el serial
 			State = STA_SALVAR;
 			cambioDeEstado();
 		}
@@ -95,7 +96,7 @@ void loop() {
 		break;
 
 	case STA_SALVAR:
-		//Si es la primera vez que entra al estado después de un cambio
+		//Si es la primera vez que entra al estado despuï¿½s de un cambio
 		if (banderaPrimer == LOW){
 			ledOff();	// Apaga los LEDs
 			banderaPrimer = HIGH;
@@ -104,18 +105,18 @@ void loop() {
 
 		if (Serial.find("S")) {
 			// lee y convierte el primer valor hasta la coma:
-			ruedas.configurarA(Serial.parseInt());
+			llantas.configurarA(Serial.parseInt());
 			// lee y convierte el segundo valor hasta la coma:
-			pwmDer = Serial.parseInt();
+			llantas.configurarB(Serial.parseInt());
 
 			//Debug---->
 			Serial.print("Motor Izq:");
 			Serial.print("\t");
-			Serial.print(pwmIzq);
+			Serial.print(llantas.retroA());
 			Serial.println();
 			Serial.print("Motor Der:");
 			Serial.print("\t");
-			Serial.print(pwmDer);
+			Serial.print(llantas.retroB());
 			Serial.println();
 
 			Serial.readBytesUntil('F', instruc, 16);
@@ -149,7 +150,9 @@ void loop() {
 	case STA_ADELANTE:
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
-			ledAdelante();
+			ledAdelante();  //Cambia los LEDs al verde hacia adelante
+     
+     
 			banderaPrimer = HIGH;
 		}
 		//Gira motor Derecho adelante 100% PWM
@@ -169,6 +172,7 @@ void loop() {
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledRepAdelante();
+			llantas.avanza();
 			banderaPrimer = HIGH;
 		}
 		//Gira motor Derecho adelante 100% PWM
@@ -189,6 +193,7 @@ void loop() {
 		if (banderaPrimer == LOW){
 			ledBlanco();	//Color para asegurar que el siguiente se despliegue correctamente
 			ledIzq();
+			llantas.detiene();
 			banderaPrimer = HIGH;
 		}
 		//Gira motor Derecho adelante 100% PWM
@@ -304,7 +309,7 @@ void loop() {
 		break;
 
 	default:
-		//Nunca debe de llegar aquí
+		//Nunca debe de llegar aquï¿½
 		//Lanzar un mensaje de error de HW y ver si SW
 		break;
 
@@ -489,7 +494,7 @@ uint32_t rainbowOrder(byte position)
 
 // ******* TIMERS ************
 
-/** Acción para la interrupción al final del timer1 */
+/** Acciï¿½n para la interrupciï¿½n al final del timer1 */
 void finTimer1(void)
 {
 	banderaTiempo1 = HIGH;

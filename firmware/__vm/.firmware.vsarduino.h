@@ -84,4 +84,9 @@ extern "C" void __cxa_pure_virtual() {;}
 #define portInputRegister(P)
 #define portModeRegister(P)
 #include <firmware.ino>
+#include <Motores.cpp>
+#include <Motores.h>
+#include <carbeto.h>
+#include <colors.h>
+#include <pins.h>
 #endif
